@@ -16,20 +16,15 @@
  */
 package org.apache.commons.scxml2;
 
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.scxml2.invoke.Invoker;
-import org.apache.commons.scxml2.model.EnterableState;
-import org.apache.commons.scxml2.model.ModelException;
+import org.apache.commons.scxml2.model.*;
 import org.apache.commons.scxml2.model.Observable;
-import org.apache.commons.scxml2.model.SCXML;
-import org.apache.commons.scxml2.model.TransitionTarget;
 import org.apache.commons.scxml2.semantics.SCXMLSemanticsImpl;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * <p>The SCXML &quot;engine&quot; that executes SCXML documents. The
@@ -484,4 +479,35 @@ public class SCXMLExecutor implements SCXMLIOProcessor {
             log.debug(sb.toString());
         }
     }
+
+
+
+    public Boolean checkForFutureTransition( TriggerEvent event, int limit,Boolean withGuardCondition ) throws ModelException {
+        return checkForFutureTransition(event,limit,null,withGuardCondition);
+    }
+
+    public Boolean checkForFutureTransition( TriggerEvent event, int limit, Set<EnterableState> set,Boolean withGuardCondition) throws ModelException{
+        if (limit  > 0) {
+            Iterator<EnterableState> it = set == null ? exctx.getScInstance().getCurrentStatus().getStates().iterator() : set.iterator();
+            while (it.hasNext()) {
+                EnterableState enterableState = it.next();
+                if (enterableState instanceof State)
+                    for (Transition transition : ((State) enterableState).getTransitionsList()) {
+                        for (TransitionTarget tt : transition.getTargets()) {
+                            if (tt instanceof EnterableState && ((EnterableState) tt).isAtomicState() && !(tt instanceof Final)) {
+                                ArrayList<EnterableState> states = new ArrayList<EnterableState>();
+                                states.add((EnterableState) tt);
+                                Boolean isTransition = ((SCXMLSemanticsImpl) semantics).checkTransitions(exctx, event, states,withGuardCondition);
+                                if (isTransition)
+                                    return true;
+                                else
+                                    return checkForFutureTransition(event, limit - 1, new HashSet<EnterableState>(states),withGuardCondition);
+                            }
+                        }
+                    }
+            }
+        }
+        return false;
+    }
+
 }
