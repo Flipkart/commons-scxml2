@@ -22,10 +22,13 @@ import org.apache.commons.scxml2.SCXMLExpressionException;
 import org.apache.commons.scxml2.SCXMLSystemContext;
 import org.apache.commons.scxml2.StateConfiguration;
 import org.apache.commons.scxml2.Status;
+import org.apache.commons.scxml2.model.SimpleTransition;
 import org.apache.commons.scxml2.model.State;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 public class GroovyEvaluatorTest {
 
@@ -53,7 +56,7 @@ public class GroovyEvaluatorTest {
     public void testBuiltInFunctions() throws SCXMLExpressionException {
         Evaluator eval = new GroovyEvaluator();
         StateConfiguration stateConfiguration = new StateConfiguration();
-        Status status = new Status(stateConfiguration);
+        Status status = new Status(stateConfiguration,new ArrayList<SimpleTransition>());
         ctx.getSystemContext().getPlatformVariables().put(SCXMLSystemContext.STATUS_KEY, status);
 
         State state1 = new State();

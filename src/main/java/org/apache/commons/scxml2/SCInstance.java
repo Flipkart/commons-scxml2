@@ -16,30 +16,17 @@
  */
 package org.apache.commons.scxml2;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.scxml2.env.SimpleContext;
-import org.apache.commons.scxml2.model.Data;
-import org.apache.commons.scxml2.model.Datamodel;
-import org.apache.commons.scxml2.model.EnterableState;
-import org.apache.commons.scxml2.model.History;
-import org.apache.commons.scxml2.model.ModelException;
-import org.apache.commons.scxml2.model.SCXML;
-import org.apache.commons.scxml2.model.TransitionalState;
+import org.apache.commons.scxml2.model.*;
 import org.apache.commons.scxml2.semantics.ErrorConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * The <code>SCInstance</code> performs book-keeping functions for
@@ -77,6 +64,8 @@ public class SCInstance implements Serializable {
      * The current state configuration of the state machine
      */
     private final StateConfiguration stateConfiguration;
+
+    private  List<SimpleTransition> lastTransitionList;
 
     /**
      * The current status of the stateMachine.
@@ -140,7 +129,8 @@ public class SCInstance implements Serializable {
         this.evaluator = evaluator;
         this.errorReporter = errorReporter;
         this.stateConfiguration = new StateConfiguration();
-        this.currentStatus = new Status(stateConfiguration);
+        this.lastTransitionList = new ArrayList<SimpleTransition>();
+        this.currentStatus = new Status(stateConfiguration,lastTransitionList);
     }
 
     /**
@@ -338,6 +328,10 @@ public class SCInstance implements Serializable {
      */
     public StateConfiguration getStateConfiguration() {
         return stateConfiguration;
+    }
+
+    public List<SimpleTransition> getLastTransitionList() {
+        return lastTransitionList;
     }
 
     /**

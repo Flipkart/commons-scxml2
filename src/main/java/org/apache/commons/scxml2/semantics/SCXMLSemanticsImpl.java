@@ -84,6 +84,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
         HashSet<TransitionalState> statesToInvoke = new HashSet<TransitionalState>();
         Step step = new Step(null);
         step.getTransitList().add(exctx.getStateMachine().getInitialTransition());
+        updateTransitionListStatus(exctx, step);
         microStep(exctx, step, statesToInvoke);
         // Execute Immediate Transitions
 
@@ -134,6 +135,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
             processInvokes(exctx, event);
             Step step = new Step(event);
             selectTransitions(exctx, step);
+            updateTransitionListStatus(exctx, step);
             if (!step.getTransitList().isEmpty()) {
                 HashSet<TransitionalState> statesToInvoke = new HashSet<TransitionalState>();
                 microStep(exctx, step, statesToInvoke);
@@ -1073,6 +1075,12 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
             }
             */
         }
+    }
+
+    private  void updateTransitionListStatus(final SCXMLExecutionContext exctx, final Step step){
+        exctx.getScInstance().getLastTransitionList().clear();
+        exctx.getScInstance().getLastTransitionList().addAll(step.getTransitList());
+
     }
 }
 
