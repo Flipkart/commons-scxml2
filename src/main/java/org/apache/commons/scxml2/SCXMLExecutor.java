@@ -501,7 +501,10 @@ public class SCXMLExecutor implements SCXMLIOProcessor {
                                 if (isTransition)
                                     return true;
                                 else
-                                    return checkForFutureTransition(event, limit - 1, new HashSet<EnterableState>(states),withGuardCondition);
+                                    if(checkForFutureTransition(event, limit - 1, new HashSet<EnterableState>(states),withGuardCondition))
+                                        return true;
+                                    else
+                                        break;
                             }
                         }
                     }
