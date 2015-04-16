@@ -515,18 +515,6 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
         return false;
     }
 
-    public Boolean checkTransitions(final SCXMLExecutionContext exctx,TriggerEvent event, ArrayList<EnterableState>config,Boolean withGuardCondition) throws  ModelException {
-           if (withGuardCondition)
-               setSystemEventVariable(exctx.getScInstance(),event,false);
-           Step step = new Step(event);
-           selectTransitions(exctx,step,config,withGuardCondition);
-           if(step.getTransitList().isEmpty()){
-               return false;
-           }else{
-               return true;
-           }
-       }
-
     /**
      * This method corresponds to the Algorithm for SCXML processing selectTransitions() as well as the
      * selectEventlessTransitions() procedure, depending on the event (or null) in the provided step
@@ -535,14 +523,10 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
      * @param step The step
      */
     public void selectTransitions(final SCXMLExecutionContext exctx, final Step step) throws ModelException {
-        selectTransitions(exctx,step,null,true);
-    }
-
-    public void selectTransitions(final SCXMLExecutionContext exctx, final Step step,   ArrayList<EnterableState>config,Boolean withGuardCondition) throws ModelException {
         step.getTransitList().clear();
         ArrayList<Transition> enabledTransitions = new ArrayList<Transition>();
 
-        ArrayList<EnterableState> configuration = config == null ? new ArrayList<EnterableState>(exctx.getScInstance().getStateConfiguration().getActiveStates()) : config;
+        ArrayList<EnterableState> configuration = new ArrayList<EnterableState>(exctx.getScInstance().getStateConfiguration().getActiveStates());
         Collections.sort(configuration,DocumentOrder.documentOrderComparator);
 
         HashSet<EnterableState> visited = new HashSet<EnterableState>();
@@ -567,11 +551,10 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
                 boolean transitionMatched = false;
                 do {
                     for (Transition transition : current.getTransitionsList()) {
-                        if (transitionMatched = matchTransition(exctx, transition, eventName,withGuardCondition)) {
+                        if (transitionMatched = matchTransition(exctx, transition, eventName)) {
                             enabledTransitions.add(transition);
                             break;
                         }
-
                     }
                     current = (!transitionMatched && ancestorIndex > -1) ? state.getAncestor(ancestorIndex--) : null;
                 } while (!transitionMatched && current != null && visited.add(current));
@@ -651,7 +634,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
      * @return Returns true if the transition matches against the provided eventName, or is event-less when no eventName
      *         is provided, <em>AND</em> its (optional) condition guard evaluates to true.
      */
-    public boolean matchTransition(final SCXMLExecutionContext exctx, final Transition transition, final String eventName,Boolean withGuardCondition) {
+    public boolean matchTransition(final SCXMLExecutionContext exctx, final Transition transition, final String eventName) {
         if (eventName != null) {
             if (!(transition.isNoEventsTransition() || transition.isAllEventsTransition())) {
                 boolean eventMatch = false;
@@ -673,7 +656,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
         else if (!transition.isNoEventsTransition()) {
             return false;
         }
-        if (withGuardCondition  && transition.getCond() != null ) {
+        if (transition.getCond() != null) {
             Boolean result = Boolean.FALSE;
             Context context = exctx.getScInstance().getContext(transition.getParent());
             context.setLocal(Context.NAMESPACES_KEY, transition.getNamespaces());

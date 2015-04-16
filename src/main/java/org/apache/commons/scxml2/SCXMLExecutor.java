@@ -479,38 +479,4 @@ public class SCXMLExecutor implements SCXMLIOProcessor {
             log.debug(sb.toString());
         }
     }
-
-
-
-    public Boolean checkForFutureTransition( TriggerEvent event, int limit,Boolean withGuardCondition ) throws ModelException {
-        return checkForFutureTransition(event,limit,null,withGuardCondition);
-    }
-
-    public Boolean checkForFutureTransition( TriggerEvent event, int limit, Set<EnterableState> set,Boolean withGuardCondition) throws ModelException{
-        if (limit  > 0) {
-            Iterator<EnterableState> it = set == null ? exctx.getScInstance().getCurrentStatus().getStates().iterator() : set.iterator();
-            while (it.hasNext()) {
-                EnterableState enterableState = it.next();
-                if (enterableState instanceof State)
-                    for (Transition transition : ((State) enterableState).getTransitionsList()) {
-                        for (TransitionTarget tt : transition.getTargets()) {
-                            if (tt instanceof EnterableState && ((EnterableState) tt).isAtomicState() && !(tt instanceof Final)) {
-                                ArrayList<EnterableState> states = new ArrayList<EnterableState>();
-                                states.add((EnterableState) tt);
-                                Boolean isTransition = ((SCXMLSemanticsImpl) semantics).checkTransitions(exctx, event, states,withGuardCondition);
-                                if (isTransition)
-                                    return true;
-                                else
-                                    if(checkForFutureTransition(event, limit - 1, new HashSet<EnterableState>(states),withGuardCondition))
-                                        return true;
-                                    else
-                                        break;
-                            }
-                        }
-                    }
-            }
-        }
-        return false;
-    }
-
 }
