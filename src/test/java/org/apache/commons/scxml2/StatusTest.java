@@ -18,13 +18,11 @@ package org.apache.commons.scxml2;
 
 import org.apache.commons.scxml2.model.EnterableState;
 import org.apache.commons.scxml2.model.Final;
-import org.apache.commons.scxml2.model.SimpleTransition;
 import org.apache.commons.scxml2.model.State;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 public class StatusTest {
@@ -35,7 +33,7 @@ public class StatusTest {
     @Before
     public void setUp() {
         stateConfiguration = new StateConfiguration();
-        status = new Status(stateConfiguration,new ArrayList<SimpleTransition>());
+        status = new Status(stateConfiguration);
     }
     
     @Test

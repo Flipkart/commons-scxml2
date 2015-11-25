@@ -65,8 +65,6 @@ public class SCInstance implements Serializable {
      */
     private final StateConfiguration stateConfiguration;
 
-    private  List<SimpleTransition> lastTransitionList;
-
     /**
      * The current status of the stateMachine.
      */
@@ -129,8 +127,7 @@ public class SCInstance implements Serializable {
         this.evaluator = evaluator;
         this.errorReporter = errorReporter;
         this.stateConfiguration = new StateConfiguration();
-        this.lastTransitionList = new ArrayList<SimpleTransition>();
-        this.currentStatus = new Status(stateConfiguration,lastTransitionList);
+        this.currentStatus = new Status(stateConfiguration);
     }
 
     /**
@@ -328,10 +325,6 @@ public class SCInstance implements Serializable {
      */
     public StateConfiguration getStateConfiguration() {
         return stateConfiguration;
-    }
-
-    public List<SimpleTransition> getLastTransitionList() {
-        return lastTransitionList;
     }
 
     /**

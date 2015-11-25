@@ -16,15 +16,20 @@
  */
 package org.apache.commons.scxml2;
 
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.scxml2.invoke.Invoker;
-import org.apache.commons.scxml2.model.*;
+import org.apache.commons.scxml2.model.EnterableState;
+import org.apache.commons.scxml2.model.ModelException;
 import org.apache.commons.scxml2.model.Observable;
+import org.apache.commons.scxml2.model.SCXML;
+import org.apache.commons.scxml2.model.TransitionTarget;
 import org.apache.commons.scxml2.semantics.SCXMLSemanticsImpl;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * <p>The SCXML &quot;engine&quot; that executes SCXML documents. The

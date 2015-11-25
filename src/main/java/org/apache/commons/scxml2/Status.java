@@ -16,13 +16,11 @@
  */
 package org.apache.commons.scxml2;
 
+import java.io.Serializable;
+import java.util.Set;
+
 import org.apache.commons.scxml2.model.EnterableState;
 import org.apache.commons.scxml2.model.Final;
-import org.apache.commons.scxml2.model.SimpleTransition;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
 
 /**
  * The immutable encapsulation of the current state of a state machine.
@@ -37,11 +35,9 @@ public class Status implements Serializable {
 
     private final StateConfiguration configuration;
 
-    private  List<SimpleTransition> lastTransitionList;
 
-    public Status(StateConfiguration configuration,List<SimpleTransition> lastTransitionList) {
+    public Status(StateConfiguration configuration) {
         this.configuration = configuration;
-        this.lastTransitionList = lastTransitionList;
     }
 
     /**
@@ -91,16 +87,5 @@ public class Status implements Serializable {
         }
         return false;
     }
-
-    public List<SimpleTransition> getLastTransitionList() {
-        return lastTransitionList;
-    }
-
-    private void clearLastTransitionList(){
-        lastTransitionList.clear();
-    }
-
-
-
 }
 

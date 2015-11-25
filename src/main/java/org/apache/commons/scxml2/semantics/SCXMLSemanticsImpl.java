@@ -16,13 +16,46 @@
  */
 package org.apache.commons.scxml2.semantics;
 
-import org.apache.commons.scxml2.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.scxml2.ActionExecutionContext;
+import org.apache.commons.scxml2.Context;
+import org.apache.commons.scxml2.ErrorReporter;
+import org.apache.commons.scxml2.SCInstance;
+import org.apache.commons.scxml2.SCXMLExecutionContext;
+import org.apache.commons.scxml2.SCXMLExpressionException;
+import org.apache.commons.scxml2.SCXMLSemantics;
+import org.apache.commons.scxml2.SCXMLSystemContext;
+import org.apache.commons.scxml2.StateConfiguration;
+import org.apache.commons.scxml2.TriggerEvent;
 import org.apache.commons.scxml2.invoke.Invoker;
 import org.apache.commons.scxml2.invoke.InvokerException;
-import org.apache.commons.scxml2.model.*;
+import org.apache.commons.scxml2.model.Action;
+import org.apache.commons.scxml2.model.DocumentOrder;
+import org.apache.commons.scxml2.model.EnterableState;
+import org.apache.commons.scxml2.model.Executable;
+import org.apache.commons.scxml2.model.Final;
+import org.apache.commons.scxml2.model.History;
+import org.apache.commons.scxml2.model.Invoke;
+import org.apache.commons.scxml2.model.OnEntry;
+import org.apache.commons.scxml2.model.OnExit;
+import org.apache.commons.scxml2.model.Script;
+import org.apache.commons.scxml2.model.SimpleTransition;
+import org.apache.commons.scxml2.model.TransitionalState;
+import org.apache.commons.scxml2.model.ModelException;
+import org.apache.commons.scxml2.model.Parallel;
+import org.apache.commons.scxml2.model.SCXML;
+import org.apache.commons.scxml2.model.State;
+import org.apache.commons.scxml2.model.Transition;
+import org.apache.commons.scxml2.model.TransitionTarget;
 import org.apache.commons.scxml2.system.EventVariable;
-
-import java.util.*;
 
 /**
  * This class encapsulate and implements the
@@ -84,7 +117,6 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
         HashSet<TransitionalState> statesToInvoke = new HashSet<TransitionalState>();
         Step step = new Step(null);
         step.getTransitList().add(exctx.getStateMachine().getInitialTransition());
-        updateTransitionListStatus(exctx, step);
         microStep(exctx, step, statesToInvoke);
         // Execute Immediate Transitions
 
@@ -135,7 +167,6 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
             processInvokes(exctx, event);
             Step step = new Step(event);
             selectTransitions(exctx, step);
-            updateTransitionListStatus(exctx, step);
             if (!step.getTransitList().isEmpty()) {
                 HashSet<TransitionalState> statesToInvoke = new HashSet<TransitionalState>();
                 microStep(exctx, step, statesToInvoke);
@@ -427,7 +458,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
      * @param tt The TransitionTarget
      */
     public void addDescendantStatesToEnter(final SCXMLExecutionContext exctx, final Step step,
-                                           final TransitionTarget tt) {
+                                              final TransitionTarget tt) {
         if (tt instanceof History) {
             History h = (History) tt;
             Set<EnterableState> lastConfiguration = step.getNewHistoryConfigurations().get(h);
@@ -482,7 +513,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
      * @param ancestor The ancestor TransitionTarget
      */
     public void addAncestorStatesToEnter(final SCXMLExecutionContext exctx, final Step step,
-                                         final TransitionTarget tt, TransitionTarget ancestor) {
+                                            final TransitionTarget tt, TransitionTarget ancestor) {
         // for for anc in getProperAncestors(tt,ancestor)
         for (int i = tt.getNumberOfAncestors()-1; i > -1; i--) {
             EnterableState anc = tt.getAncestor(i);
@@ -941,7 +972,7 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
      * @param target The target of the Transition
      */
     public void notifyOnTransition(final SCXMLExecutionContext exctx, final Transition t,
-                                   final TransitionTarget target) {
+                                      final TransitionTarget target) {
         EventVariable event = (EventVariable)exctx.getScInstance().getSystemContext().getVars().get(SCXMLSystemContext.EVENT_KEY);
         String eventName = event != null ? event.getName() : null;
         exctx.getNotificationRegistry().fireOnTransition(t, t.getParent(), target, t, eventName);
@@ -1058,12 +1089,6 @@ public class SCXMLSemanticsImpl implements SCXMLSemantics {
             }
             */
         }
-    }
-
-    private  void updateTransitionListStatus(final SCXMLExecutionContext exctx, final Step step){
-        exctx.getScInstance().getLastTransitionList().clear();
-        exctx.getScInstance().getLastTransitionList().addAll(step.getTransitList());
-
     }
 }
 
